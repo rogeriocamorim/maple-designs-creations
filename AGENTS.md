@@ -18,7 +18,8 @@ This version has breaking changes -- APIs, conventions, and file structure may a
 | UI | React + Tailwind CSS v4 | React 19, TW v4 |
 | Components | Radix UI primitives + custom wrappers | -- |
 | Database | PostgreSQL via Prisma ORM (`@prisma/adapter-pg`) | PG 16, Prisma 7.x |
-| Testing | Vitest + jsdom + Testing Library | Vitest 4.x |
+| Unit Testing | Vitest + jsdom + Testing Library | Vitest 4.x |
+| E2E Testing | Playwright (Chromium) | Playwright latest |
 | Icons | lucide-react | -- |
 | Charts | recharts | -- |
 | Deploy | Docker multi-stage standalone build | node:22-alpine |
@@ -28,6 +29,15 @@ This version has breaking changes -- APIs, conventions, and file structure may a
 ## Project Structure
 
 ```
+e2e/                   # Playwright E2E test specs
+├── calculator.spec.ts # Calculator inputs, validation, save, reset
+├── filaments.spec.ts  # Filament CRUD, search, inventory
+├── history.spec.ts    # Quote save flow, search, expand, delete
+├── marketplaces.spec.ts # Marketplace CRUD
+├── navigation.spec.ts # Nav links, redirect, active state
+├── printers.spec.ts   # Printer CRUD, validation, edit
+├── settings.spec.ts   # Settings form, save, persist
+└── supplies.spec.ts   # Supply CRUD, computed unit cost, search
 src/
 ├── actions/           # Server actions (Prisma CRUD + revalidation)
 │   ├── filaments.ts
@@ -226,6 +236,11 @@ npm run lint             # ESLint
 npm run test             # Vitest (single run)
 npm run test:watch       # Vitest (watch mode)
 
+# E2E Testing
+npm run test:e2e         # Playwright E2E tests (headless)
+npm run test:e2e:headed  # Playwright E2E tests (visible browser)
+npm run test:e2e:ui      # Playwright interactive UI mode
+
 # Database
 npx prisma generate      # Regenerate Prisma client
 npx prisma migrate dev --name init   # Create/apply migration
@@ -252,13 +267,81 @@ See `.env.example` and `.env.production.example` for templates.
 
 ## Testing
 
+### Unit Tests (Vitest)
+
 - **Framework**: Vitest 4.x with jsdom environment.
 - **Matchers**: `@testing-library/jest-dom` (loaded via `src/test/setup.ts`).
 - **Path alias**: `@/` resolves to `src/` in test config.
-- **Scope**: Unit tests for pure calculation functions in `src/lib/calculations.test.ts`.
+- **Scope**: 72 unit tests for pure calculation functions in `src/lib/calculations.test.ts`.
 - **Run**: `npm run test` (single run) or `npm run test:watch` (watch mode).
+- **Config**: `vitest.config.ts` excludes `e2e/`, `node_modules`, `dist`, `.next` to avoid picking up Playwright specs.
 
-Tests must pass before any push. Run `npm run test` to verify.
+Test coverage includes:
+- Filament cost per gram, total filament cost, waste factor
+- Printer electricity cost, maintenance cost, depreciation
+- Labor cost calculations
+- Total COGS computation
+- Marketplace fee calculations (Etsy, Amazon, Shopify, Facebook, custom, no-fee)
+- Margin and suggested price calculations
+- Edge cases: zero values, negative inputs, boundary conditions, scaling linearity, high-value items, round-trip margin verification
+
+### E2E Tests (Playwright)
+
+- **Framework**: Playwright with Chromium only.
+- **Config**: `playwright.config.ts` with `webServer` auto-start for `npm run dev`.
+- **Workers**: 1 (serial execution, tests share database state within a spec file).
+- **Specs**: 55 tests across 8 spec files.
+- **Run**: `npm run test:e2e` (headless), `npm run test:e2e:headed` (visible), `npm run test:e2e:ui` (interactive).
+
+To run against an already-running dev server (avoids spawning a second one):
+```bash
+E2E_BASE_URL=http://localhost:3000 npx playwright test
+```
+
+To run against the deployed production instance:
+```bash
+E2E_BASE_URL=http://192.168.2.13:3002 npx playwright test
+```
+
+#### E2E Spec Files
+
+| Spec | Tests | Coverage |
+|---|---|---|
+| `navigation.spec.ts` | 5 | Home redirect, branding, nav links, routing, active state |
+| `settings.spec.ts` | 4 | Section headings, electricity rate CRUD, margin CRUD, save state |
+| `printers.spec.ts` | 6 | Empty state, dialog open, validation, create, edit, delete |
+| `filaments.spec.ts` | 7 | Heading, empty state, dialog, create (with Radix Select), inventory panel, search, delete |
+| `supplies.spec.ts` | 8 | Heading, empty state, dialog, computed unit cost, create, card display, search, delete |
+| `marketplaces.spec.ts` | 5 | Heading, empty state, dialog, create, delete |
+| `calculator.spec.ts` | 13 | Heading, model name, print time, models per plate, negative validation, minutes clamping, advanced toggle, labor, parts, supplies, reset, save validation, cost panel |
+| `history.spec.ts` | 7 | Heading, empty state, search input, full save-view flow, search, expand, delete |
+
+#### E2E Selector Patterns
+
+Pages with CRUD entities (Filaments, Supplies, Marketplaces) have two "Add X" buttons: one in the page header and one in the empty state. Always use `.first()` when targeting the header button:
+```ts
+await page.getByRole("button", { name: "Add Filament" }).first().click();
+```
+
+For Radix Select options that share prefix names (e.g., PLA, PLA+, Silk PLA), use `exact: true`:
+```ts
+await page.getByRole("option", { name: "PLA", exact: true }).click();
+```
+
+For delete buttons on cards, scope to the card locator and use role:
+```ts
+const card = page.locator("[class*='rounded-xl']", { hasText: "Item Name" }).first();
+await card.getByRole("button", { name: "Delete" }).click();
+```
+
+For section headings that also appear as labels/descriptions, use heading role:
+```ts
+await expect(page.getByRole("heading", { name: "Electricity" })).toBeVisible();
+```
+
+### Test Requirements
+
+All tests (unit + E2E) must pass before any push. The CI pipeline runs unit tests automatically; E2E tests are run locally before merging.
 
 ---
 
