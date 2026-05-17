@@ -1,0 +1,116 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Settings {
+  id                    Int    @id @default(1)
+  electricityRatePerKwh Float  @default(0.12)
+  targetNetMarginPct    Float  @default(45)
+  currency              String @default("USD")
+}
+
+model Printer {
+  id                   Int      @id @default(autoincrement())
+  name                 String
+  brand                String
+  modelName            String
+  nozzleSize           Float?
+  nozzleMaterial       String?
+  buildPlate           String?
+  powerWatts           Float    @default(250)
+  maintenanceCostPerHr Float    @default(0.06)
+  purchasePrice        Float    @default(0)
+  lifespanHours        Float    @default(0)
+  dailyUsageHours      Float    @default(0)
+  imageUrl             String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}
+
+model Filament {
+  id             Int      @id @default(autoincrement())
+  brand          String
+  material       String
+  colorName      String
+  colorHex       String   @default("#000000")
+  diameter       Float    @default(1.75)
+  spoolSizeG     Float    @default(1000)
+  costPerSpool   Float
+  wasteFactor    Float    @default(0)
+  purchaseUrl    String?
+  lowStockAlertG Float    @default(200)
+  currentStockG  Float    @default(0)
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Supply {
+  id        Int      @id @default(autoincrement())
+  name      String
+  cost      Float
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Marketplace {
+  id                     Int            @id @default(autoincrement())
+  name                   String
+  type                   String
+  listingFee             Float?         @default(0.20)
+  transactionFeePct      Float?         @default(6.5)
+  paymentProcessingPct   Float?         @default(3.0)
+  paymentProcessingFixed Float?         @default(0.25)
+  referralFeePct         Float?         @default(15.0)
+  adSpendEntries         AdSpendEntry[]
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+  quoteResults           QuoteMarketplaceResult[]
+}
+
+model AdSpendEntry {
+  id            String      @id @default(cuid())
+  marketplaceId Int
+  marketplace   Marketplace @relation(fields: [marketplaceId], references: [id], onDelete: Cascade)
+  startDate     DateTime
+  endDate       DateTime
+  totalSpend    Float
+  notes         String?
+  createdAt     DateTime    @default(now())
+}
+
+model Quote {
+  id            Int      @id @default(autoincrement())
+  modelName     String
+  savedAt       DateTime @default(now())
+  filamentCost  Float
+  printerCost   Float
+  laborCost     Float
+  suppliesCost  Float
+  totalCogs     Float
+  stateSnapshot Json
+  results       QuoteMarketplaceResult[]
+}
+
+model QuoteMarketplaceResult {
+  id              Int         @id @default(autoincrement())
+  quoteId         Int
+  quote           Quote       @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  marketplaceId   Int
+  marketplace     Marketplace @relation(fields: [marketplaceId], references: [id])
+  marketplaceName String
+  listingPrice    Float
+  discountPct     Float
+  buyerPays       Float
+  platformFees    Float
+  netProfit       Float
+  profitPerHour   Float
+  grossMarginPct  Float
+  netMarginPct    Float
+}

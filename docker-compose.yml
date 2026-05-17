@@ -1,0 +1,30 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: mapledesigns
+      POSTGRES_USER: mapledesigns
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mapledesigns"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    image: mapledesigns:latest
+    pull_policy: never
+    restart: unless-stopped
+    ports:
+      - "3002:3000"
+    environment:
+      DATABASE_URL: postgresql://mapledesigns:${POSTGRES_PASSWORD}@postgres:5432/mapledesigns
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
