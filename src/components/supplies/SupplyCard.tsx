@@ -20,6 +20,8 @@ export function SupplyCard({ supply }: Props) {
   const [deleting, setDeleting] = useState(false);
   const { fmt } = useCurrency();
 
+  const inventoryValue = supply.unitCost * supply.currentStock;
+
   async function handleDelete() {
     if (!confirm(`Delete "${supply.name}"?`)) return;
     setDeleting(true);
@@ -37,8 +39,13 @@ export function SupplyCard({ supply }: Props) {
             )}
           </div>
           <div className="text-right flex-shrink-0">
-            <div className="text-sm font-semibold text-[#e05a2b]">{fmt(supply.cost)}</div>
+            <div className="text-sm font-semibold text-[#e05a2b]">{fmt(supply.unitCost)}/unit</div>
           </div>
+        </div>
+        <div className="mt-2 flex items-center gap-3 text-xs text-[#6b7280]">
+          <span>{supply.currentStock} of {supply.quantity} units in stock</span>
+          <span className="text-[#e5e5e5]">|</span>
+          <span>{fmt(inventoryValue)} value</span>
         </div>
         <div className="mt-3 flex justify-end gap-2">
           <Button size="sm" variant="ghost" onClick={() => setEditOpen(true)}>

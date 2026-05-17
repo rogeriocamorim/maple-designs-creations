@@ -46,7 +46,10 @@ export interface FilamentData {
 export interface SupplyData {
   id: number;
   name: string;
-  cost: number;
+  quantity: number;
+  totalPrice: number;
+  unitCost: number;
+  currentStock: number;
   notes: string | null;
   createdAt: Date;
   updatedAt: Date;

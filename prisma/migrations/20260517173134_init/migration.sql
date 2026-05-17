@@ -51,6 +51,21 @@ CREATE TABLE "Filament" (
 );
 
 -- CreateTable
+CREATE TABLE "Supply" (
+    "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+    "quantity" INTEGER NOT NULL,
+    "totalPrice" DOUBLE PRECISION NOT NULL,
+    "unitCost" DOUBLE PRECISION NOT NULL,
+    "currentStock" INTEGER NOT NULL DEFAULT 0,
+    "notes" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Supply_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Marketplace" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,

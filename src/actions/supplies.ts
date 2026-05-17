@@ -9,10 +9,22 @@ export async function getSupplies() {
 
 export async function createSupply(data: {
   name: string;
-  cost: number;
+  quantity: number;
+  totalPrice: number;
+  currentStock: number;
   notes?: string | null;
 }) {
-  const supply = await prisma.supply.create({ data });
+  const unitCost = data.quantity > 0 ? data.totalPrice / data.quantity : 0;
+  const supply = await prisma.supply.create({
+    data: {
+      name: data.name,
+      quantity: data.quantity,
+      totalPrice: data.totalPrice,
+      unitCost,
+      currentStock: data.currentStock,
+      notes: data.notes,
+    },
+  });
   revalidatePath("/supplies");
   revalidatePath("/calculator");
   return supply;
@@ -22,11 +34,28 @@ export async function updateSupply(
   id: number,
   data: {
     name?: string;
-    cost?: number;
+    quantity?: number;
+    totalPrice?: number;
+    currentStock?: number;
     notes?: string | null;
   }
 ) {
-  const supply = await prisma.supply.update({ where: { id }, data });
+  // If quantity or totalPrice changed, recompute unitCost
+  let unitCost: number | undefined;
+  if (data.quantity !== undefined || data.totalPrice !== undefined) {
+    const existing = await prisma.supply.findUniqueOrThrow({ where: { id } });
+    const qty = data.quantity ?? existing.quantity;
+    const price = data.totalPrice ?? existing.totalPrice;
+    unitCost = qty > 0 ? price / qty : 0;
+  }
+
+  const supply = await prisma.supply.update({
+    where: { id },
+    data: {
+      ...data,
+      ...(unitCost !== undefined ? { unitCost } : {}),
+    },
+  });
   revalidatePath("/supplies");
   revalidatePath("/calculator");
   return supply;

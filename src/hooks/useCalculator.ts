@@ -175,7 +175,7 @@ function reducer(state: CalculatorState, action: Action): CalculatorState {
         ...state,
         supplyLines: state.supplyLines.map((l) =>
           l.id === action.lineId
-            ? { ...l, supplyId: action.supply.id, name: action.supply.name, unitCost: action.supply.cost }
+            ? { ...l, supplyId: action.supply.id, name: action.supply.name, unitCost: action.supply.unitCost }
             : l
         ),
       };

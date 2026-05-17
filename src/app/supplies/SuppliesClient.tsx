@@ -13,6 +13,10 @@ interface Props {
   supplies: SupplyData[];
 }
 
+function inventoryValue(list: SupplyData[]) {
+  return list.reduce((sum, s) => sum + s.unitCost * s.currentStock, 0);
+}
+
 export function SuppliesClient({ supplies }: Props) {
   const [addOpen, setAddOpen] = useState(false);
   const [addSaving, setAddSaving] = useState(false);
@@ -24,7 +28,8 @@ export function SuppliesClient({ supplies }: Props) {
     s.name.toLowerCase().includes(filter.toLowerCase())
   );
 
-  const totalValue = supplies.reduce((sum, s) => sum + s.cost, 0);
+  const globalValue = inventoryValue(supplies);
+  const filteredValue = inventoryValue(filtered);
 
   return (
     <div>
@@ -32,8 +37,13 @@ export function SuppliesClient({ supplies }: Props) {
         <div>
           <h1 className="text-xl font-semibold text-[#1a1a1a]">Supplies</h1>
           <p className="mt-0.5 text-sm text-[#6b7280]">
-            {supplies.length} supply item{supplies.length !== 1 ? "s" : ""} · Total catalog cost: {fmt(totalValue)}
+            {supplies.length} supply item{supplies.length !== 1 ? "s" : ""} · Total Inventory: {fmt(globalValue)}
           </p>
+          {filter && filtered.length !== supplies.length && (
+            <p className="mt-0.5 text-xs text-[#9ca3af]">
+              Showing {filtered.length} result{filtered.length !== 1 ? "s" : ""} · {fmt(filteredValue)} value
+            </p>
+          )}
         </div>
         <div className="flex items-center gap-3">
           <input

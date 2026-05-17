@@ -303,7 +303,7 @@ export function CalculatorClient({ printers, filaments, marketplaces, supplies, 
                                   { value: "__manual__", label: "-- Manual entry --" },
                                   ...supplies.map((s) => ({
                                     value: s.id.toString(),
-                                    label: `${s.name} (${fmt(s.cost)})`,
+                                    label: `${s.name} (${fmt(s.unitCost)}/unit)`,
                                   })),
                                 ]}
                                 value={line.supplyId?.toString() ?? "__manual__"}
