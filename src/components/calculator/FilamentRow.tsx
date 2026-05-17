@@ -66,7 +66,7 @@ export function FilamentRow({ line, filaments, onUpdate, onRemove, showRemove }:
           step="1"
           placeholder="0"
           value={line.grams || ""}
-          onChange={(e) => onUpdate("grams", parseFloat(e.target.value) || 0)}
+          onChange={(e) => onUpdate("grams", Math.max(0, parseFloat(e.target.value) || 0))}
         />
       </div>
       <div className="col-span-1">

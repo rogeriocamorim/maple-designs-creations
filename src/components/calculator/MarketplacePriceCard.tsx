@@ -29,7 +29,7 @@ export function MarketplacePriceCard({
   onCalculatedPriceChange,
   onDiscountChange,
 }: Props) {
-  const { fmt } = useCurrency();
+  const { fmt, symbol } = useCurrency();
   const isPositive = result.netProfit >= 0;
 
   return (
@@ -111,8 +111,8 @@ export function MarketplacePriceCard({
               type="number"
               min="0"
               step="0.01"
-              value={pricing.manualPrice.toFixed(2)}
-              onChange={(e) => onManualPriceChange(parseFloat(e.target.value) || 0)}
+              value={pricing.manualPrice || ""}
+              onChange={(e) => onManualPriceChange(Math.max(0, parseFloat(e.target.value) || 0))}
               className="w-20 rounded border border-[#e5e5e5] px-2 py-1 text-right text-sm focus:border-[#e05a2b] focus:outline-none"
             />
           </div>
@@ -123,13 +123,13 @@ export function MarketplacePriceCard({
       {pricing.mode === "calculated" && (
         <div className="px-4 pb-3">
           <div className="flex items-center gap-2">
-            <span className="text-sm text-[#6b7280]">$</span>
+            <span className="text-sm text-[#6b7280]">{symbol}</span>
             <input
               type="number"
               min="0"
               step="0.01"
-              value={pricing.calculatedPrice.toFixed(2)}
-              onChange={(e) => onCalculatedPriceChange(parseFloat(e.target.value) || 0)}
+              value={pricing.calculatedPrice || ""}
+              onChange={(e) => onCalculatedPriceChange(Math.max(0, parseFloat(e.target.value) || 0))}
               className="w-28 rounded border border-[#e5e5e5] px-2 py-1.5 text-sm focus:border-[#e05a2b] focus:outline-none"
             />
           </div>
@@ -157,8 +157,8 @@ export function MarketplacePriceCard({
                 type="number"
                 min="0"
                 max="100"
-                value={pricing.discountPct}
-                onChange={(e) => onDiscountChange(parseFloat(e.target.value) || 0)}
+                value={pricing.discountPct || ""}
+                onChange={(e) => onDiscountChange(Math.min(100, Math.max(0, parseFloat(e.target.value) || 0)))}
                 className="w-12 rounded border border-[#e5e5e5] px-1.5 py-0.5 text-xs focus:border-[#e05a2b] focus:outline-none"
               />
               <span className="text-[#6b7280]">%</span>

@@ -111,9 +111,9 @@ export function CalculatorClient({ printers, filaments, marketplaces, supplies, 
                   label="Models Per Plate"
                   type="number"
                   min="1"
-                  value={state.modelsPerPlate}
+                  value={state.modelsPerPlate || ""}
                   onChange={(e) =>
-                    dispatch({ type: "SET_MODELS_PER_PLATE", value: parseInt(e.target.value) || 1 })
+                    dispatch({ type: "SET_MODELS_PER_PLATE", value: Math.max(1, parseInt(e.target.value) || 1) })
                   }
                 />
               </div>
@@ -122,11 +122,11 @@ export function CalculatorClient({ printers, filaments, marketplaces, supplies, 
                   label="Print Time — Hours"
                   type="number"
                   min="0"
-                  value={state.printTimeHours}
+                  value={state.printTimeHours || ""}
                   onChange={(e) =>
                     dispatch({
                       type: "SET_PRINT_TIME",
-                      hours: parseInt(e.target.value) || 0,
+                      hours: Math.max(0, parseInt(e.target.value) || 0),
                       minutes: state.printTimeMinutes,
                     })
                   }
@@ -139,12 +139,12 @@ export function CalculatorClient({ printers, filaments, marketplaces, supplies, 
                   type="number"
                   min="0"
                   max="59"
-                  value={state.printTimeMinutes}
+                  value={state.printTimeMinutes || ""}
                   onChange={(e) =>
                     dispatch({
                       type: "SET_PRINT_TIME",
                       hours: state.printTimeHours,
-                      minutes: parseInt(e.target.value) || 0,
+                      minutes: Math.min(59, Math.max(0, parseInt(e.target.value) || 0)),
                     })
                   }
                   hint="Minutes"
@@ -249,9 +249,9 @@ export function CalculatorClient({ printers, filaments, marketplaces, supplies, 
                     label="Time (minutes)"
                     type="number"
                     min="0"
-                    value={state.laborTimeMinutes}
+                    value={state.laborTimeMinutes || ""}
                     onChange={(e) =>
-                      dispatch({ type: "SET_LABOR_TIME", minutes: parseInt(e.target.value) || 0 })
+                      dispatch({ type: "SET_LABOR_TIME", minutes: Math.max(0, parseInt(e.target.value) || 0) })
                     }
                   />
                   <Input
@@ -259,11 +259,11 @@ export function CalculatorClient({ printers, filaments, marketplaces, supplies, 
                     type="number"
                     min="0"
                     step="0.01"
-                    value={state.laborCostPerHr}
+                    value={state.laborCostPerHr || ""}
                     onChange={(e) =>
                       dispatch({
                         type: "SET_LABOR_COST",
-                        costPerHr: parseFloat(e.target.value) || 0,
+                        costPerHr: Math.max(0, parseFloat(e.target.value) || 0),
                       })
                     }
                     prefix={symbol}
@@ -347,9 +347,9 @@ export function CalculatorClient({ printers, filaments, marketplaces, supplies, 
                             label="Qty"
                             type="number"
                             min="1"
-                            value={line.quantity}
+                            value={line.quantity || ""}
                             onChange={(e) =>
-                              dispatch({ type: "SET_SUPPLY_LINE", lineId: line.id, field: "quantity", value: parseInt(e.target.value) || 1 })
+                              dispatch({ type: "SET_SUPPLY_LINE", lineId: line.id, field: "quantity", value: Math.max(1, parseInt(e.target.value) || 1) })
                             }
                           />
                         </div>
@@ -359,9 +359,9 @@ export function CalculatorClient({ printers, filaments, marketplaces, supplies, 
                             type="number"
                             min="0"
                             step="0.01"
-                            value={line.unitCost}
+                            value={line.unitCost || ""}
                             onChange={(e) =>
-                              dispatch({ type: "SET_SUPPLY_LINE", lineId: line.id, field: "unitCost", value: parseFloat(e.target.value) || 0 })
+                              dispatch({ type: "SET_SUPPLY_LINE", lineId: line.id, field: "unitCost", value: Math.max(0, parseFloat(e.target.value) || 0) })
                             }
                             prefix={symbol}
                           />
