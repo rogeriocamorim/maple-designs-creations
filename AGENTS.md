@@ -262,7 +262,39 @@ Tests must pass before any push. Run `npm run test` to verify.
 
 ---
 
-## Docker & Deployment
+## CI/CD & Deployment
+
+### Pipeline Overview
+
+```
+Push to main
+    │
+    ▼
+GitHub Actions (ubuntu-24.04-arm -- native ARM64)
+    ├── Run tests (npm test)
+    ├── Build ARM64 Docker image (native, with layer caching)
+    └── Push to ghcr.io/rogeriocamorim/maple-designs-creations:latest
+                │
+                ▼
+Watchtower (on OrangePi, polls ghcr.io every 60s)
+    ├── Detects new image
+    ├── Pulls it
+    └── Restarts the app container
+                │
+                ▼
+Portainer (on OrangePi)
+    └── Monitor containers, logs, health
+```
+
+### GitHub Actions (`.github/workflows/deploy.yml`)
+
+- **Trigger**: Push to `main`
+- **Runner**: `ubuntu-24.04-arm` (native ARM64, free for public repos)
+- **Test job**: Installs deps, generates Prisma client, runs `npm test`
+- **Build job**: Builds Docker image with GHA layer caching, pushes to `ghcr.io`
+- **Image tags**: `latest` + commit SHA for traceability
+
+### Docker
 
 Multi-stage Dockerfile (`node:22-alpine`):
 1. **deps** -- installs dependencies with native build tools
@@ -271,7 +303,27 @@ Multi-stage Dockerfile (`node:22-alpine`):
 
 Entrypoint runs `prisma migrate deploy` before starting the server, so the database schema is always up to date on deploy.
 
-`docker-compose.yml` exposes the app on port **3002** (mapped from container port 3000).
+### Container Names
+
+| Container | Image | Purpose |
+|---|---|---|
+| `mapledesigns-app` | `ghcr.io/rogeriocamorim/maple-designs-creations:latest` | Next.js app (port 3002 -> 3000) |
+| `mapledesigns-postgres` | `postgres:16-alpine` | PostgreSQL 16 database |
+| `mapledesigns-watchtower` | `containrrr/watchtower` | Auto-updates app container |
+
+### Deploy Target
+
+- **Host**: OrangePi at `192.168.2.13` (SSH alias: `orangepi`)
+- **App directory**: `/opt/mapledesigns/`
+- **App URL**: `http://192.168.2.13:3002`
+- **Monitoring**: Portainer on the OrangePi
+
+### Manual Deploy (Fallback)
+
+If needed, `deploy.sh` pushes the compose file and triggers a pull+restart:
+```bash
+bash deploy.sh
+```
 
 ---
 

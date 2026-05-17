@@ -1,5 +1,6 @@
 services:
   postgres:
+    container_name: mapledesigns-postgres
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
@@ -15,8 +16,8 @@ services:
       retries: 5
 
   app:
-    image: mapledesigns:latest
-    pull_policy: never
+    container_name: mapledesigns-app
+    image: ghcr.io/rogeriocamorim/maple-designs-creations:latest
     restart: unless-stopped
     ports:
       - "3002:3000"
@@ -25,6 +26,18 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+
+  watchtower:
+    container_name: mapledesigns-watchtower
+    image: containrrr/watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      WATCHTOWER_CLEANUP: "true"
+      WATCHTOWER_POLL_INTERVAL: 60
+      WATCHTOWER_INCLUDE_STOPPED: "false"
+    command: mapledesigns-app
 
 volumes:
   postgres_data:
