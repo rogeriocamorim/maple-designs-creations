@@ -79,7 +79,7 @@ export function CalculatorClient({ printers, filaments, marketplaces, supplies, 
       stateSnapshot: state,
       marketplaceResults,
     });
-    alert(editingQuoteId ? "Quote updated!" : "Quote saved! Check History to review it.");
+    alert(editingQuoteId ? "Quote updated!" : "Quote saved! Check Quotes to review it.");
   }
 
   const printerOptions = printers.map((p) => ({
@@ -412,7 +412,7 @@ export function CalculatorClient({ printers, filaments, marketplaces, supplies, 
           </Button>
           <Button onClick={handleSave}>
             <Save className="h-4 w-4" />
-            Save to Model
+            {editingQuoteId ? "Update Quote" : "Save Quote"}
           </Button>
         </div>
       </div>
@@ -433,7 +433,7 @@ export function CalculatorClient({ printers, filaments, marketplaces, supplies, 
             </Button>
             <Button size="sm" onClick={handleSave}>
               <Save className="h-3.5 w-3.5" />
-              Save to Model
+              {editingQuoteId ? "Update Quote" : "Save Quote"}
             </Button>
           </div>
         </div>
