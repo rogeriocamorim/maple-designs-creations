@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useRef, useEffect } from "react";
 import { Slider } from "@/components/ui/Slider";
 import { Badge } from "@/components/ui/Badge";
 import { formatPercent } from "@/utils/formatters";
@@ -17,6 +18,47 @@ interface Props {
 }
 
 const SLIDER_MAX = 500;
+
+/** Small inline numeric input that allows intermediate values like "0.", "0.2" */
+function InlineNumericInput({
+  value,
+  onChange,
+  className,
+  ...props
+}: {
+  value: number;
+  onChange: (n: number) => void;
+  className?: string;
+} & Omit<React.InputHTMLAttributes<HTMLInputElement>, "value" | "onChange" | "type">) {
+  const [local, setLocal] = useState(value ? String(value) : "");
+  const focused = useRef(false);
+
+  useEffect(() => {
+    if (!focused.current) {
+      setLocal(value ? String(value) : "");
+    }
+  }, [value]);
+
+  return (
+    <input
+      type="number"
+      value={local}
+      onChange={(e) => {
+        setLocal(e.target.value);
+        const n = parseFloat(e.target.value);
+        if (!isNaN(n)) onChange(n);
+        else if (e.target.value === "") onChange(0);
+      }}
+      onFocus={() => { focused.current = true; }}
+      onBlur={() => {
+        focused.current = false;
+        setLocal(value ? String(value) : "");
+      }}
+      className={className}
+      {...props}
+    />
+  );
+}
 
 export function MarketplacePriceCard({
   marketplace,
@@ -95,12 +137,11 @@ export function MarketplacePriceCard({
               step={0.01}
               className="flex-1"
             />
-            <input
-              type="number"
-              min="0"
-              step="0.01"
-              value={pricing.manualPrice || ""}
-              onChange={(e) => onManualPriceChange(Math.max(0, parseFloat(e.target.value) || 0))}
+            <InlineNumericInput
+              min={0}
+              step={0.01}
+              value={pricing.manualPrice}
+              onChange={(n) => onManualPriceChange(Math.max(0, n))}
               className="w-20 rounded border border-[#e5e5e5] px-2 py-1 text-right text-sm focus:border-[#e05a2b] focus:outline-none"
             />
           </div>
@@ -120,12 +161,11 @@ export function MarketplacePriceCard({
           <div>
             <div className="text-[#6b7280] uppercase tracking-wide font-medium">Discount</div>
             <div className="flex items-center gap-1">
-              <input
-                type="number"
-                min="0"
-                max="100"
-                value={pricing.discountPct || ""}
-                onChange={(e) => onDiscountChange(Math.min(100, Math.max(0, parseFloat(e.target.value) || 0)))}
+              <InlineNumericInput
+                min={0}
+                max={100}
+                value={pricing.discountPct}
+                onChange={(n) => onDiscountChange(Math.min(100, Math.max(0, n)))}
                 className="w-12 rounded border border-[#e5e5e5] px-1.5 py-0.5 text-xs focus:border-[#e05a2b] focus:outline-none"
               />
               <span className="text-[#6b7280]">%</span>
