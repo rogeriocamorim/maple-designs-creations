@@ -9,7 +9,7 @@ Cost calculator for 3D print businesses. Calculates production costs and target 
 - **Printers** — CRUD with live operating cost (electricity + maintenance + depreciation)
 - **Filaments** — CRUD with stock tracking and low-stock alerts
 - **Marketplaces** — Etsy and generic/Amazon fee structures with manual ad spend entries
-- **Quote History** — Persistent price snapshots to review over time
+- **Quotes** — Persistent price snapshots to review over time
 
 ## Local Development
 

@@ -1,13 +1,13 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("Quote History Page", () => {
+test.describe("Quotes Page", () => {
   test("shows page heading", async ({ page }) => {
-    await page.goto("/history");
-    await expect(page.getByRole("heading", { name: "Quote History" })).toBeVisible();
+    await page.goto("/quotes");
+    await expect(page.getByRole("heading", { name: "Quotes" })).toBeVisible();
   });
 
   test("shows empty state when no quotes saved", async ({ page }) => {
-    await page.goto("/history");
+    await page.goto("/quotes");
     const hasQuotes = await page.locator("[class*='rounded-xl'][class*='border']").count();
     if (hasQuotes === 0) {
       await expect(page.getByText("No quotes saved yet")).toBeVisible();
@@ -16,11 +16,11 @@ test.describe("Quote History Page", () => {
   });
 
   test("search input is visible", async ({ page }) => {
-    await page.goto("/history");
+    await page.goto("/quotes");
     await expect(page.getByPlaceholder("Search by model name...")).toBeVisible();
   });
 
-  test("full flow: save quote from calculator, view in history", async ({ page }) => {
+  test("full flow: save quote from calculator, view in quotes", async ({ page }) => {
     // First, create a quote from the calculator
     await page.goto("/calculator");
 
@@ -38,8 +38,8 @@ test.describe("Quote History Page", () => {
     // Wait for save alert to be handled
     await page.waitForTimeout(1000);
 
-    // Navigate to history
-    await page.goto("/history");
+    // Navigate to quotes
+    await page.goto("/quotes");
 
     // Should see the saved quote
     await expect(page.getByText("E2E Test Widget")).toBeVisible({ timeout: 10000 });
@@ -48,8 +48,8 @@ test.describe("Quote History Page", () => {
     await expect(page.getByText(/\d+ saved quote/)).toBeVisible();
   });
 
-  test("can search quotes in history", async ({ page }) => {
-    await page.goto("/history");
+  test("can search quotes", async ({ page }) => {
+    await page.goto("/quotes");
 
     const searchInput = page.getByPlaceholder("Search by model name...");
     await searchInput.fill("E2E Test Widget");
@@ -66,7 +66,7 @@ test.describe("Quote History Page", () => {
   });
 
   test("can expand quote details", async ({ page }) => {
-    await page.goto("/history");
+    await page.goto("/quotes");
 
     // Only test if quotes exist
     const quoteCard = page.locator("[class*='rounded-xl']", { hasText: "COGS" }).first();
@@ -83,7 +83,7 @@ test.describe("Quote History Page", () => {
   });
 
   test("can delete a quote", async ({ page }) => {
-    await page.goto("/history");
+    await page.goto("/quotes");
 
     const quoteCard = page.locator("[class*='rounded-xl']", { hasText: "E2E Test Widget" }).first();
     const hasQuote = await quoteCard.isVisible().catch(() => false);

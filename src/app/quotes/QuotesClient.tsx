@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronDown, ChevronUp, Trash2, ArrowUpRight, History, Calculator } from "lucide-react";
+import { ChevronDown, ChevronUp, Trash2, ArrowUpRight, FileText, Calculator } from "lucide-react";
 import { deleteQuote } from "@/actions/quotes";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
@@ -167,7 +167,7 @@ function QuoteCard({ quote }: { quote: Quote }) {
   );
 }
 
-export function HistoryClient({ quotes }: Props) {
+export function QuotesClient({ quotes }: Props) {
   const [search, setSearch] = useState("");
 
   const filtered = quotes.filter((q) =>
@@ -178,7 +178,7 @@ export function HistoryClient({ quotes }: Props) {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-[#1a1a1a]">Quote History</h1>
+          <h1 className="text-xl font-semibold text-[#1a1a1a]">Quotes</h1>
           <p className="mt-0.5 text-sm text-[#6b7280]">{quotes.length} saved quote{quotes.length !== 1 ? "s" : ""}</p>
         </div>
         <input
@@ -192,7 +192,7 @@ export function HistoryClient({ quotes }: Props) {
 
       {quotes.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[#e5e5e5] bg-white py-16 text-center">
-          <History className="mb-3 h-10 w-10 text-[#e5e5e5]" />
+          <FileText className="mb-3 h-10 w-10 text-[#e5e5e5]" />
           <p className="text-sm font-medium text-[#6b7280]">No quotes saved yet</p>
           <p className="mt-1 text-xs text-[#9ca3af]">
             Use &ldquo;Save to Model&rdquo; in the Calculator to store pricing snapshots

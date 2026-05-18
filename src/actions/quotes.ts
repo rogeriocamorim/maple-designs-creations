@@ -64,13 +64,13 @@ export async function saveQuote(data: {
     });
   }
 
-  revalidatePath("/history");
+  revalidatePath("/quotes");
   return quote;
 }
 
 export async function deleteQuote(id: number) {
   await prisma.quote.delete({ where: { id } });
-  revalidatePath("/history");
+  revalidatePath("/quotes");
 }
 
 export async function getQuoteSnapshot(id: number): Promise<CalculatorState | null> {

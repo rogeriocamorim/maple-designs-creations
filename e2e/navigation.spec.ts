@@ -20,7 +20,7 @@ test.describe("Navigation & Layout", () => {
       "Filaments",
       "Supplies",
       "Marketplaces",
-      "History",
+      "Quotes",
       "Settings",
     ]) {
       await expect(nav.getByText(label)).toBeVisible();
@@ -47,9 +47,9 @@ test.describe("Navigation & Layout", () => {
     await expect(page).toHaveURL(/\/marketplaces/);
     await expect(page.getByRole("heading", { name: "Marketplaces" })).toBeVisible();
 
-    await nav.getByText("History").click();
-    await expect(page).toHaveURL(/\/history/);
-    await expect(page.getByRole("heading", { name: "Quote History" })).toBeVisible();
+    await nav.getByText("Quotes").click();
+    await expect(page).toHaveURL(/\/quotes/);
+    await expect(page.getByRole("heading", { name: "Quotes" })).toBeVisible();
 
     await nav.getByText("Settings").click();
     await expect(page).toHaveURL(/\/settings/);

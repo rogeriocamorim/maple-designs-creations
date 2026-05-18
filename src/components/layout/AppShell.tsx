@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Calculator, Printer, Layers, ShoppingBag, PackageOpen, History, Settings } from "lucide-react";
+import { Calculator, Printer, Layers, ShoppingBag, PackageOpen, FileText, Settings } from "lucide-react";
 import { cn } from "@/utils/cn";
 
 const navItems = [
@@ -11,7 +11,7 @@ const navItems = [
   { href: "/filaments", label: "Filaments", icon: Layers },
   { href: "/supplies", label: "Supplies", icon: PackageOpen },
   { href: "/marketplaces", label: "Marketplaces", icon: ShoppingBag },
-  { href: "/history", label: "History", icon: History },
+  { href: "/quotes", label: "Quotes", icon: FileText },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 

@@ -32,7 +32,7 @@ This version has breaking changes -- APIs, conventions, and file structure may a
 e2e/                   # Playwright E2E test specs
 ├── calculator.spec.ts # Calculator inputs, validation, save, reset
 ├── filaments.spec.ts  # Filament CRUD, search, inventory
-├── history.spec.ts    # Quote save flow, search, expand, delete
+├── quotes.spec.ts     # Quote save flow, search, expand, delete
 ├── marketplaces.spec.ts # Marketplace CRUD
 ├── navigation.spec.ts # Nav links, redirect, active state
 ├── printers.spec.ts   # Printer CRUD, validation, edit
@@ -49,7 +49,7 @@ src/
 ├── app/               # Next.js App Router pages
 │   ├── calculator/    # Quote calculator
 │   ├── filaments/     # Filament inventory management
-│   ├── history/       # Saved quotes history
+│   ├── quotes/       # Saved quotes
 │   ├── marketplaces/  # Marketplace fee configuration
 │   ├── printers/      # Printer fleet management
 │   ├── settings/      # App settings (currency, rates)
@@ -314,7 +314,7 @@ E2E_BASE_URL=http://192.168.2.13:3002 npx playwright test
 | `supplies.spec.ts` | 8 | Heading, empty state, dialog, computed unit cost, create, card display, search, delete |
 | `marketplaces.spec.ts` | 5 | Heading, empty state, dialog, create, delete |
 | `calculator.spec.ts` | 13 | Heading, model name, print time, models per plate, negative validation, minutes clamping, advanced toggle, labor, parts, supplies, reset, save validation, cost panel |
-| `history.spec.ts` | 7 | Heading, empty state, search input, full save-view flow, search, expand, delete |
+| `quotes.spec.ts` | 7 | Heading, empty state, search input, full save-view flow, search, expand, delete |
 
 #### E2E Selector Patterns
 

@@ -37,7 +37,7 @@ export function CalculatorClient({ printers, filaments, marketplaces, supplies, 
     useCalculator(printers, filaments, marketplaces, settings, supplies);
   const { fmt, symbol } = useCurrency();
 
-  // Load initial state from quote history
+  // Load initial state from saved quote
   useEffect(() => {
     if (initialState) {
       dispatch({ type: "LOAD_STATE", state: initialState });
