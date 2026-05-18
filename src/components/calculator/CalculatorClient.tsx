@@ -451,7 +451,6 @@ export function CalculatorClient({ printers, filaments, marketplaces, supplies, 
               const pricing = state.marketplacePricing[mp.id] ?? {
                 mode: "suggested" as const,
                 manualPrice: suggestedPrices[mp.id] ?? 0,
-                calculatedPrice: suggestedPrices[mp.id] ?? 0,
                 discountPct: 0,
               };
               return (
@@ -466,9 +465,6 @@ export function CalculatorClient({ printers, filaments, marketplaces, supplies, 
                   }
                   onManualPriceChange={(price) =>
                     dispatch({ type: "SET_MANUAL_PRICE", marketplaceId: mp.id, price })
-                  }
-                  onCalculatedPriceChange={(price) =>
-                    dispatch({ type: "SET_CALCULATED_PRICE", marketplaceId: mp.id, price })
                   }
                   onDiscountChange={(discountPct) =>
                     dispatch({ type: "SET_DISCOUNT", marketplaceId: mp.id, discountPct })

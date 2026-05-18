@@ -11,9 +11,8 @@ interface Props {
   result: MarketplaceResult;
   suggestedPrice: number;
   pricing: MarketplacePricingState;
-  onModeChange: (mode: "suggested" | "calculated" | "manual") => void;
+  onModeChange: (mode: "suggested" | "manual") => void;
   onManualPriceChange: (price: number) => void;
-  onCalculatedPriceChange: (price: number) => void;
   onDiscountChange: (pct: number) => void;
 }
 
@@ -26,7 +25,6 @@ export function MarketplacePriceCard({
   pricing,
   onModeChange,
   onManualPriceChange,
-  onCalculatedPriceChange,
   onDiscountChange,
 }: Props) {
   const { fmt, symbol } = useCurrency();
@@ -48,20 +46,10 @@ export function MarketplacePriceCard({
       </div>
 
       {/* Pricing mode cards */}
-      <div className="grid grid-cols-3 gap-2 p-3">
-        {(["suggested", "calculated", "manual"] as const).map((mode) => {
-          let modePrice: number;
-          if (mode === "suggested") modePrice = suggestedPrice;
-          else if (mode === "calculated") modePrice = pricing.calculatedPrice;
-          else modePrice = pricing.manualPrice;
-
-          const modeResult = { ...result };
-          const modeLabel = {
-            suggested: "3DPF Suggested",
-            calculated: "Calculated",
-            manual: "Manual Override",
-          }[mode];
-
+      <div className="grid grid-cols-2 gap-2 p-3">
+        {(["suggested", "manual"] as const).map((mode) => {
+          const modePrice = mode === "suggested" ? suggestedPrice : pricing.manualPrice;
+          const modeLabel = mode === "suggested" ? "Suggested" : "Manual Override";
           const isActive = pricing.mode === mode;
 
           return (
@@ -119,23 +107,6 @@ export function MarketplacePriceCard({
         </div>
       )}
 
-      {/* Calculated price input */}
-      {pricing.mode === "calculated" && (
-        <div className="px-4 pb-3">
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-[#6b7280]">{symbol}</span>
-            <input
-              type="number"
-              min="0"
-              step="0.01"
-              value={pricing.calculatedPrice || ""}
-              onChange={(e) => onCalculatedPriceChange(Math.max(0, parseFloat(e.target.value) || 0))}
-              className="w-28 rounded border border-[#e5e5e5] px-2 py-1.5 text-sm focus:border-[#e05a2b] focus:outline-none"
-            />
-          </div>
-        </div>
-      )}
-
       {/* Breakdown */}
       <div className="border-t border-[#e5e5e5] bg-[#f8f8f8] px-4 py-3">
         <div className="grid grid-cols-3 gap-3 text-xs mb-3">
@@ -143,11 +114,7 @@ export function MarketplacePriceCard({
             <div className="text-[#6b7280] uppercase tracking-wide font-medium">Listing Price</div>
             <div className="font-semibold text-[#1a1a1a]">{fmt(result.listingPrice)}</div>
             <div className="text-[#9ca3af]">
-              {pricing.mode === "suggested"
-                ? "3DPF Suggested"
-                : pricing.mode === "manual"
-                ? "Manual"
-                : "Calculated"}
+              {pricing.mode === "suggested" ? "Suggested" : "Manual"}
             </div>
           </div>
           <div>

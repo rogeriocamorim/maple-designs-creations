@@ -93,12 +93,11 @@ export interface CalculatorPart {
   filaments: CalculatorFilamentLine[];
 }
 
-export type PricingMode = "suggested" | "calculated" | "manual";
+export type PricingMode = "suggested" | "manual";
 
 export interface MarketplacePricingState {
   mode: PricingMode;
   manualPrice: number;
-  calculatedPrice: number;
   discountPct: number;
 }
 

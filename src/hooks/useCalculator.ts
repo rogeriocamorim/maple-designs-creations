@@ -93,7 +93,6 @@ type Action =
   | { type: "SET_ADVANCED_OPEN"; open: boolean }
   | { type: "SET_PRICING_MODE"; marketplaceId: number; mode: PricingMode }
   | { type: "SET_MANUAL_PRICE"; marketplaceId: number; price: number }
-  | { type: "SET_CALCULATED_PRICE"; marketplaceId: number; price: number }
   | { type: "SET_DISCOUNT"; marketplaceId: number; discountPct: number }
   | { type: "INIT_MARKETPLACE"; marketplaceId: number; suggestedPrice: number }
   | { type: "RESET" }
@@ -185,7 +184,6 @@ function reducer(state: CalculatorState, action: Action): CalculatorState {
       const existing = state.marketplacePricing[action.marketplaceId] ?? {
         mode: "suggested",
         manualPrice: 0,
-        calculatedPrice: 0,
         discountPct: 0,
       };
       return {
@@ -200,7 +198,6 @@ function reducer(state: CalculatorState, action: Action): CalculatorState {
       const existing = state.marketplacePricing[action.marketplaceId] ?? {
         mode: "manual",
         manualPrice: 0,
-        calculatedPrice: 0,
         discountPct: 0,
       };
       return {
@@ -211,26 +208,10 @@ function reducer(state: CalculatorState, action: Action): CalculatorState {
         },
       };
     }
-    case "SET_CALCULATED_PRICE": {
-      const existing = state.marketplacePricing[action.marketplaceId] ?? {
-        mode: "calculated",
-        manualPrice: 0,
-        calculatedPrice: 0,
-        discountPct: 0,
-      };
-      return {
-        ...state,
-        marketplacePricing: {
-          ...state.marketplacePricing,
-          [action.marketplaceId]: { ...existing, calculatedPrice: action.price },
-        },
-      };
-    }
     case "SET_DISCOUNT": {
       const existing = state.marketplacePricing[action.marketplaceId] ?? {
         mode: "suggested",
         manualPrice: 0,
-        calculatedPrice: 0,
         discountPct: 0,
       };
       return {
@@ -250,7 +231,6 @@ function reducer(state: CalculatorState, action: Action): CalculatorState {
           [action.marketplaceId]: {
             mode: "suggested",
             manualPrice: Math.max(action.suggestedPrice, 0),
-            calculatedPrice: Math.max(action.suggestedPrice, 0),
             discountPct: 0,
           },
         },
@@ -351,8 +331,6 @@ export function useCalculator(
       let listingPrice: number;
       if (!pricing || pricing.mode === "suggested") {
         listingPrice = suggestedPrice;
-      } else if (pricing.mode === "calculated") {
-        listingPrice = pricing.calculatedPrice;
       } else {
         listingPrice = pricing.manualPrice;
       }
