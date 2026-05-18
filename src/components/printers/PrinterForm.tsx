@@ -39,7 +39,6 @@ export function PrinterForm({ ref, printer, electricityRate, onClose, onSavingCh
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  useImperativeHandle(ref, () => ({ submit: handleSubmit }));
   const { symbol } = useCurrency();
 
   const watts = parseFloat(powerWatts) || 0;
@@ -95,6 +94,8 @@ export function PrinterForm({ ref, printer, electricityRate, onClose, onSavingCh
     onSavingChange?.(false);
     onClose();
   }
+
+  useImperativeHandle(ref, () => ({ submit: handleSubmit }));
 
   const brandOptions = PRINTER_BRANDS.map((b) => ({ value: b, label: b }));
   const nozzleSizeOptions = NOZZLE_SIZES.map((s) => ({ value: s.toString(), label: `${s}mm` }));

@@ -29,10 +29,6 @@ export function SupplyForm({ ref, supply, onClose, onSavingChange }: Props) {
   const price = parseFloat(totalPrice) || 0;
   const computedUnitCost = qty > 0 ? price / qty : 0;
 
-  useImperativeHandle(ref, () => ({
-    submit: handleSubmit,
-  }));
-
   async function handleSubmit() {
     if (!name.trim() || qty < 1) return;
     onSavingChange?.(true);
@@ -60,6 +56,10 @@ export function SupplyForm({ ref, supply, onClose, onSavingChange }: Props) {
       onSavingChange?.(false);
     }
   }
+
+  useImperativeHandle(ref, () => ({
+    submit: handleSubmit,
+  }));
 
   return (
     <div className="space-y-4">

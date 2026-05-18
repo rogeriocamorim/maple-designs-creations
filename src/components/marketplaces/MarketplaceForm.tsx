@@ -65,7 +65,6 @@ export function MarketplaceForm({ ref, marketplace, onClose, onSavingChange }: P
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [adSpendDeleteId, setAdSpendDeleteId] = useState<string | null>(null);
 
-  useImperativeHandle(ref, () => ({ submit: handleSubmit }));
   const { symbol, fmt } = useCurrency();
 
   function handlePresetChange(newType: string) {
@@ -129,6 +128,8 @@ export function MarketplaceForm({ ref, marketplace, onClose, onSavingChange }: P
     onSavingChange?.(false);
     onClose();
   }
+
+  useImperativeHandle(ref, () => ({ submit: handleSubmit }));
 
   async function handleAddAdSpend() {
     if (!marketplace || !adSpend || parseFloat(adSpend) <= 0) return;

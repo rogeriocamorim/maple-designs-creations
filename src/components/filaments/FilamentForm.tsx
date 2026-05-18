@@ -35,7 +35,6 @@ export function FilamentForm({ ref, filament, onClose, onSavingChange }: Props) 
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  useImperativeHandle(ref, () => ({ submit: handleSubmit }));
   const { symbol } = useCurrency();
 
   const costPerGram =
@@ -81,6 +80,8 @@ export function FilamentForm({ ref, filament, onClose, onSavingChange }: Props) 
     onSavingChange?.(false);
     onClose();
   }
+
+  useImperativeHandle(ref, () => ({ submit: handleSubmit }));
 
   const brandOptions = FILAMENT_BRANDS.map((b) => ({ value: b, label: b }));
   const materialOptions = FILAMENT_MATERIALS.map((m) => ({ value: m, label: m }));
