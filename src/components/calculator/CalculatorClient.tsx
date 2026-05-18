@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { ChevronDown, ChevronUp, Plus, RotateCcw, Save, Settings, X } from "lucide-react";
 import { saveQuote } from "@/actions/quotes";
 import { Button } from "@/components/ui/Button";
@@ -36,6 +37,7 @@ export function CalculatorClient({ printers, filaments, marketplaces, supplies, 
   const { state, dispatch, selectedPrinter, cogs, marketplaceResults, suggestedPrices, totalFilamentCost, printerCost, laborCost, suppliesCost } =
     useCalculator(printers, filaments, marketplaces, settings, supplies);
   const { fmt, symbol } = useCurrency();
+  const router = useRouter();
 
   // Load initial state from saved quote
   useEffect(() => {
@@ -79,7 +81,7 @@ export function CalculatorClient({ printers, filaments, marketplaces, supplies, 
       stateSnapshot: state,
       marketplaceResults,
     });
-    alert(editingQuoteId ? "Quote updated!" : "Quote saved! Check Quotes to review it.");
+    router.push("/quotes");
   }
 
   const printerOptions = printers.map((p) => ({

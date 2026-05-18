@@ -28,18 +28,10 @@ test.describe("Quotes Page", () => {
     await page.getByLabel("Print Time — Hours").fill("1");
     await page.getByLabel("Print Time — Minutes").fill("30");
 
-    // Handle the save alert
-    page.on("dialog", async (dialog) => {
-      await dialog.accept();
-    });
-
     await page.getByRole("button", { name: /Save/ }).first().click();
 
-    // Wait for save alert to be handled
-    await page.waitForTimeout(1000);
-
-    // Navigate to quotes
-    await page.goto("/quotes");
+    // Should auto-navigate to quotes page
+    await expect(page).toHaveURL(/\/quotes/, { timeout: 10000 });
 
     // Should see the saved quote
     await expect(page.getByText("E2E Test Widget")).toBeVisible({ timeout: 10000 });
