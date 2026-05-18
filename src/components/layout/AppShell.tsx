@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Calculator, Printer, Layers, ShoppingBag, PackageOpen, FileText, Settings } from "lucide-react";
 import { cn } from "@/utils/cn";
+import packageJson from "../../../package.json";
 
 const navItems = [
   { href: "/calculator", label: "Calculator", icon: Calculator },
@@ -28,6 +29,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </div>
             <span className="text-sm font-bold uppercase tracking-widest text-[#1a1a1a]">
               Maple Designs Creations
+            </span>
+            <span className="text-[10px] font-medium text-[#9ca3af]">
+              v{packageJson.version}
             </span>
           </div>
         </div>

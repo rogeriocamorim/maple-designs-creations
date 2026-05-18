@@ -7,6 +7,7 @@ import { deleteMarketplace } from "@/actions/marketplaces";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Dialog } from "@/components/ui/Dialog";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { MarketplaceForm, type MarketplaceFormHandle } from "./MarketplaceForm";
 import type { MarketplaceData } from "@/lib/types";
 
@@ -27,9 +28,10 @@ export function MarketplaceCard({ marketplace }: Props) {
   const [editSaving, setEditSaving] = useState(false);
   const editFormRef = useRef<MarketplaceFormHandle>(null);
   const [deleting, setDeleting] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   async function handleDelete() {
-    if (!confirm(`Delete "${marketplace.name}"?`)) return;
+    setConfirmOpen(false);
     setDeleting(true);
     await deleteMarketplace(marketplace.id);
   }
@@ -69,7 +71,7 @@ export function MarketplaceCard({ marketplace }: Props) {
             <Pencil className="h-3.5 w-3.5" />
             Edit
           </Button>
-          <Button size="sm" variant="danger" onClick={handleDelete} disabled={deleting}>
+          <Button size="sm" variant="danger" onClick={() => setConfirmOpen(true)} disabled={deleting}>
             <Trash2 className="h-3.5 w-3.5" />
             Delete
           </Button>
@@ -97,6 +99,16 @@ export function MarketplaceCard({ marketplace }: Props) {
           onSavingChange={setEditSaving}
         />
       </Dialog>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        title="Delete Marketplace"
+        description={`Are you sure you want to delete "${marketplace.name}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        onConfirm={handleDelete}
+        disabled={deleting}
+      />
     </>
   );
 }

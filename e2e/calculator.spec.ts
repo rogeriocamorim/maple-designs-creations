@@ -151,14 +151,15 @@ test.describe("Calculator Page", () => {
   test("save requires model name", async ({ page }) => {
     await page.goto("/calculator");
 
-    // Handle the alert dialog
-    page.on("dialog", async (dialog) => {
-      expect(dialog.message()).toContain("model name");
-      await dialog.accept();
-    });
-
     // Try to save without model name
     await page.getByRole("button", { name: /Save/ }).first().click();
+
+    // Alert dialog should appear with model name message
+    const alertDialog = page.getByRole("alertdialog");
+    await expect(alertDialog).toBeVisible();
+    await expect(alertDialog.getByRole("heading", { name: "Model Name Required" })).toBeVisible();
+    await alertDialog.getByRole("button", { name: "OK" }).click();
+    await expect(alertDialog).not.toBeVisible();
   });
 
   test("cost summary panel is visible", async ({ page }) => {

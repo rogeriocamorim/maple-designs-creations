@@ -85,8 +85,10 @@ test.describe("Printers CRUD", () => {
     const card = page.locator("[class*='rounded-xl']", { hasText: "E2E Printer Updated" }).first();
 
     // Click delete button
-    page.on("dialog", (dialog) => dialog.accept());
     await card.getByRole("button", { name: "Delete" }).click();
+
+    // Confirm in the modal dialog
+    await page.getByRole("alertdialog").getByRole("button", { name: "Delete" }).click();
 
     // Printer should be gone
     await expect(page.getByText("E2E Printer Updated")).not.toBeVisible({ timeout: 10000 });

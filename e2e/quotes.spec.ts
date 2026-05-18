@@ -81,13 +81,14 @@ test.describe("Quotes Page", () => {
     const hasQuote = await quoteCard.isVisible().catch(() => false);
 
     if (hasQuote) {
-      page.on("dialog", async (dialog) => {
-        expect(dialog.message()).toContain("E2E Test Widget");
-        await dialog.accept();
-      });
-
       // Click delete button (red trash icon)
       await quoteCard.locator("button[class*='danger'], button:has(svg)").last().click();
+
+      // Confirm in the modal dialog
+      const alertDialog = page.getByRole("alertdialog");
+      await expect(alertDialog).toBeVisible();
+      await expect(alertDialog.getByText("E2E Test Widget")).toBeVisible();
+      await alertDialog.getByRole("button", { name: "Delete" }).click();
 
       await expect(page.getByText("E2E Test Widget")).not.toBeVisible({ timeout: 10000 });
     }

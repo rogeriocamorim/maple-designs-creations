@@ -75,8 +75,10 @@ test.describe("Filaments CRUD", () => {
     await page.goto("/filaments");
 
     const card = page.locator("[class*='rounded-xl']", { hasText: "E2E Black" }).first();
-    page.on("dialog", (dialog) => dialog.accept());
     await card.getByRole("button", { name: "Delete" }).click();
+
+    // Confirm in the modal dialog
+    await page.getByRole("alertdialog").getByRole("button", { name: "Delete" }).click();
 
     await expect(page.getByText("E2E Black")).not.toBeVisible({ timeout: 10000 });
   });

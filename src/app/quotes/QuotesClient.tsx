@@ -6,6 +6,7 @@ import { ChevronDown, ChevronUp, Trash2, ArrowUpRight, FileText, Calculator } fr
 import { deleteQuote } from "@/actions/quotes";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { formatDate, formatPercent } from "@/utils/formatters";
 import { useCurrency } from "@/contexts/CurrencyContext";
 
@@ -42,11 +43,12 @@ interface Props {
 function QuoteCard({ quote }: { quote: Quote }) {
   const [expanded, setExpanded] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const { fmt } = useCurrency();
   const router = useRouter();
 
   async function handleDelete() {
-    if (!confirm(`Delete quote for "${quote.modelName}"?`)) return;
+    setConfirmOpen(false);
     setDeleting(true);
     await deleteQuote(quote.id);
   }
@@ -56,114 +58,126 @@ function QuoteCard({ quote }: { quote: Quote }) {
   }
 
   return (
-    <div className="rounded-xl border border-[#e5e5e5] bg-white overflow-hidden">
-      <div
-        className="flex items-start justify-between p-4 cursor-pointer hover:bg-[#fafafa] transition-colors"
-        onClick={handleLoadInCalculator}
-      >
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-3">
-            <h3 className="font-semibold text-[#1a1a1a]">{quote.modelName}</h3>
-            <span className="text-xs text-[#6b7280]">{formatDate(quote.savedAt)}</span>
+    <>
+      <div className="rounded-xl border border-[#e5e5e5] bg-white overflow-hidden">
+        <div
+          className="flex items-start justify-between p-4 cursor-pointer hover:bg-[#fafafa] transition-colors"
+          onClick={handleLoadInCalculator}
+        >
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-3">
+              <h3 className="font-semibold text-[#1a1a1a]">{quote.modelName}</h3>
+              <span className="text-xs text-[#6b7280]">{formatDate(quote.savedAt)}</span>
+            </div>
+            <div className="mt-1.5 flex flex-wrap gap-2">
+              <span className="text-xs text-[#6b7280]">
+                COGS: <strong className="text-[#e05a2b]">{fmt(quote.totalCogs)}</strong>
+              </span>
+              {quote.results.map((r) => (
+                <Badge key={r.id} variant={r.netProfit >= 0 ? "success" : "danger"}>
+                  {r.marketplaceName}: {fmt(r.listingPrice)}
+                </Badge>
+              ))}
+            </div>
+            <div className="mt-1.5 flex items-center gap-1 text-xs text-[#e05a2b]">
+              <Calculator className="h-3 w-3" />
+              <span>Click to load in Calculator</span>
+            </div>
           </div>
-          <div className="mt-1.5 flex flex-wrap gap-2">
-            <span className="text-xs text-[#6b7280]">
-              COGS: <strong className="text-[#e05a2b]">{fmt(quote.totalCogs)}</strong>
-            </span>
-            {quote.results.map((r) => (
-              <Badge key={r.id} variant={r.netProfit >= 0 ? "success" : "danger"}>
-                {r.marketplaceName}: {fmt(r.listingPrice)}
-              </Badge>
-            ))}
-          </div>
-          <div className="mt-1.5 flex items-center gap-1 text-xs text-[#e05a2b]">
-            <Calculator className="h-3 w-3" />
-            <span>Click to load in Calculator</span>
+          <div className="flex items-center gap-2 ml-3" onClick={(e) => e.stopPropagation()}>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setExpanded(!expanded)}
+            >
+              {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
+            <Button size="sm" variant="danger" onClick={() => setConfirmOpen(true)} disabled={deleting}>
+              <Trash2 className="h-3.5 w-3.5" />
+            </Button>
           </div>
         </div>
-        <div className="flex items-center gap-2 ml-3" onClick={(e) => e.stopPropagation()}>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => setExpanded(!expanded)}
-          >
-            {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          </Button>
-          <Button size="sm" variant="danger" onClick={handleDelete} disabled={deleting}>
-            <Trash2 className="h-3.5 w-3.5" />
-          </Button>
-        </div>
+
+        {expanded && (
+          <div className="border-t border-[#e5e5e5] bg-[#f8f8f8] p-4">
+            {/* COGS breakdown */}
+            <div className="mb-4 grid grid-cols-4 gap-3 rounded-lg border border-[#e5e5e5] bg-white p-3 text-xs">
+              <div>
+                <div className="text-[#6b7280] uppercase tracking-wide font-medium">Filament</div>
+                <div className="font-semibold text-[#1a1a1a]">{fmt(quote.filamentCost)}</div>
+              </div>
+              <div>
+                <div className="text-[#6b7280] uppercase tracking-wide font-medium">Printer</div>
+                <div className="font-semibold text-[#1a1a1a]">{fmt(quote.printerCost)}</div>
+              </div>
+              <div>
+                <div className="text-[#6b7280] uppercase tracking-wide font-medium">Labor</div>
+                <div className="font-semibold text-[#1a1a1a]">{fmt(quote.laborCost)}</div>
+              </div>
+              <div>
+                <div className="text-[#6b7280] uppercase tracking-wide font-medium">Total COGS</div>
+                <div className="font-bold text-[#e05a2b]">{fmt(quote.totalCogs)}</div>
+              </div>
+            </div>
+
+            {/* Marketplace results */}
+            <div className="space-y-3">
+              {quote.results.map((r) => (
+                <div
+                  key={r.id}
+                  className="rounded-lg border border-[#e5e5e5] bg-white p-3"
+                >
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="text-sm font-semibold text-[#1a1a1a]">{r.marketplaceName}</span>
+                    <Badge variant={r.netProfit >= 0 ? "success" : "danger"}>
+                      {r.netProfit >= 0 ? "Profitable" : "Loss"}
+                    </Badge>
+                  </div>
+                  <div className="grid grid-cols-5 gap-2 text-xs">
+                    <div>
+                      <div className="text-[#6b7280]">Listing Price</div>
+                      <div className="font-semibold">{fmt(r.listingPrice)}</div>
+                    </div>
+                    <div>
+                      <div className="text-[#6b7280]">Platform Fees</div>
+                      <div className="font-semibold text-red-600">{fmt(r.platformFees)}</div>
+                    </div>
+                    <div>
+                      <div className="text-[#6b7280]">Net Profit</div>
+                      <div className={`font-semibold ${r.netProfit >= 0 ? "text-green-600" : "text-red-600"}`}>
+                        {fmt(r.netProfit)}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-[#6b7280]">Profit/Hr</div>
+                      <div className={`font-semibold ${r.profitPerHour >= 0 ? "text-green-600" : "text-red-600"}`}>
+                        {fmt(r.profitPerHour)}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-[#6b7280]">Net Margin</div>
+                      <div className={`font-semibold ${r.netMarginPct >= 0 ? "text-green-600" : "text-red-600"}`}>
+                        {formatPercent(r.netMarginPct)}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
-      {expanded && (
-        <div className="border-t border-[#e5e5e5] bg-[#f8f8f8] p-4">
-          {/* COGS breakdown */}
-          <div className="mb-4 grid grid-cols-4 gap-3 rounded-lg border border-[#e5e5e5] bg-white p-3 text-xs">
-            <div>
-              <div className="text-[#6b7280] uppercase tracking-wide font-medium">Filament</div>
-              <div className="font-semibold text-[#1a1a1a]">{fmt(quote.filamentCost)}</div>
-            </div>
-            <div>
-              <div className="text-[#6b7280] uppercase tracking-wide font-medium">Printer</div>
-              <div className="font-semibold text-[#1a1a1a]">{fmt(quote.printerCost)}</div>
-            </div>
-            <div>
-              <div className="text-[#6b7280] uppercase tracking-wide font-medium">Labor</div>
-              <div className="font-semibold text-[#1a1a1a]">{fmt(quote.laborCost)}</div>
-            </div>
-            <div>
-              <div className="text-[#6b7280] uppercase tracking-wide font-medium">Total COGS</div>
-              <div className="font-bold text-[#e05a2b]">{fmt(quote.totalCogs)}</div>
-            </div>
-          </div>
-
-          {/* Marketplace results */}
-          <div className="space-y-3">
-            {quote.results.map((r) => (
-              <div
-                key={r.id}
-                className="rounded-lg border border-[#e5e5e5] bg-white p-3"
-              >
-                <div className="mb-2 flex items-center justify-between">
-                  <span className="text-sm font-semibold text-[#1a1a1a]">{r.marketplaceName}</span>
-                  <Badge variant={r.netProfit >= 0 ? "success" : "danger"}>
-                    {r.netProfit >= 0 ? "Profitable" : "Loss"}
-                  </Badge>
-                </div>
-                <div className="grid grid-cols-5 gap-2 text-xs">
-                  <div>
-                    <div className="text-[#6b7280]">Listing Price</div>
-                    <div className="font-semibold">{fmt(r.listingPrice)}</div>
-                  </div>
-                  <div>
-                    <div className="text-[#6b7280]">Platform Fees</div>
-                    <div className="font-semibold text-red-600">{fmt(r.platformFees)}</div>
-                  </div>
-                  <div>
-                    <div className="text-[#6b7280]">Net Profit</div>
-                    <div className={`font-semibold ${r.netProfit >= 0 ? "text-green-600" : "text-red-600"}`}>
-                      {fmt(r.netProfit)}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-[#6b7280]">Profit/Hr</div>
-                    <div className={`font-semibold ${r.profitPerHour >= 0 ? "text-green-600" : "text-red-600"}`}>
-                      {fmt(r.profitPerHour)}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-[#6b7280]">Net Margin</div>
-                    <div className={`font-semibold ${r.netMarginPct >= 0 ? "text-green-600" : "text-red-600"}`}>
-                      {formatPercent(r.netMarginPct)}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
+      <ConfirmDialog
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        title="Delete Quote"
+        description={`Are you sure you want to delete the quote for "${quote.modelName}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        onConfirm={handleDelete}
+        disabled={deleting}
+      />
+    </>
   );
 }
 

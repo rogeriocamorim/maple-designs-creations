@@ -78,8 +78,10 @@ test.describe("Supplies CRUD", () => {
     await page.goto("/supplies");
 
     const card = page.locator("[class*='rounded-xl']", { hasText: "E2E Test Box" }).first();
-    page.on("dialog", (dialog) => dialog.accept());
     await card.getByRole("button", { name: "Delete" }).click();
+
+    // Confirm in the modal dialog
+    await page.getByRole("alertdialog").getByRole("button", { name: "Delete" }).click();
 
     await expect(page.getByText("E2E Test Box")).not.toBeVisible({ timeout: 10000 });
   });

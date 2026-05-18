@@ -343,6 +343,15 @@ await expect(page.getByRole("heading", { name: "Electricity" })).toBeVisible();
 
 All tests (unit + E2E) must pass before any push. The CI pipeline runs unit tests automatically; E2E tests are run locally before merging.
 
+### Versioning
+
+Every code push **must** bump the version in `package.json` using semver:
+- **Patch** (0.2.0 → 0.2.1): bug fixes, minor tweaks, copy changes
+- **Minor** (0.2.0 → 0.3.0): new features, new pages, significant UI changes
+- **Major** (0.x.y → 1.0.0): breaking changes, major redesigns
+
+The version is displayed in the app header (next to "Maple Designs Creations") via `AppShell.tsx` importing `package.json`. This allows quick visual confirmation of which version is deployed on the OrangePi.
+
 ---
 
 ## CI/CD & Deployment

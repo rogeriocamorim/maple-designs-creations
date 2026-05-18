@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronDown, ChevronUp, Plus, RotateCcw, Save, Settings, X } from "lucide-react";
 import { saveQuote } from "@/actions/quotes";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
+import { AlertDialog } from "@/components/ui/ConfirmDialog";
 import { PartRow } from "./PartRow";
 import { MarketplacePriceCard } from "./MarketplacePriceCard";
 import { CostSummaryPanel } from "./CostSummaryPanel";
@@ -38,6 +39,7 @@ export function CalculatorClient({ printers, filaments, marketplaces, supplies, 
     useCalculator(printers, filaments, marketplaces, settings, supplies);
   const { fmt, symbol } = useCurrency();
   const router = useRouter();
+  const [alertOpen, setAlertOpen] = useState(false);
 
   // Load initial state from saved quote
   useEffect(() => {
@@ -71,7 +73,7 @@ export function CalculatorClient({ printers, filaments, marketplaces, supplies, 
 
   async function handleSave() {
     if (!state.modelName.trim()) {
-      alert("Please enter a model name before saving.");
+      setAlertOpen(true);
       return;
     }
     await saveQuote({
@@ -92,6 +94,7 @@ export function CalculatorClient({ printers, filaments, marketplaces, supplies, 
   const printTimeHours = state.printTimeHours + state.printTimeMinutes / 60;
 
   return (
+    <>
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_480px] xl:grid-cols-[1fr_560px]">
       {/* LEFT PANEL */}
       <div className="space-y-4">
@@ -485,5 +488,13 @@ export function CalculatorClient({ printers, filaments, marketplaces, supplies, 
         )}
       </div>
     </div>
+
+    <AlertDialog
+      open={alertOpen}
+      onOpenChange={setAlertOpen}
+      title="Model Name Required"
+      description="Please enter a model name before saving."
+    />
+    </>
   );
 }

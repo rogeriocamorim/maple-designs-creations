@@ -5,6 +5,7 @@ import { Pencil, Trash2, Printer } from "lucide-react";
 import { deletePrinter } from "@/actions/printers";
 import { Button } from "@/components/ui/Button";
 import { Dialog } from "@/components/ui/Dialog";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { PrinterForm, type PrinterFormHandle } from "./PrinterForm";
 import { calcPrinterHourlyCost } from "@/lib/calculations";
 import type { PrinterData } from "@/lib/types";
@@ -19,6 +20,7 @@ export function PrinterCard({ printer, electricityRate }: Props) {
   const [editSaving, setEditSaving] = useState(false);
   const editFormRef = useRef<PrinterFormHandle>(null);
   const [deleting, setDeleting] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const cost = calcPrinterHourlyCost(
     {
@@ -31,7 +33,7 @@ export function PrinterCard({ printer, electricityRate }: Props) {
   );
 
   async function handleDelete() {
-    if (!confirm(`Delete "${printer.name}"?`)) return;
+    setConfirmOpen(false);
     setDeleting(true);
     await deletePrinter(printer.id);
   }
@@ -79,7 +81,7 @@ export function PrinterCard({ printer, electricityRate }: Props) {
             <Pencil className="h-3.5 w-3.5" />
             Edit
           </Button>
-          <Button size="sm" variant="danger" onClick={handleDelete} disabled={deleting}>
+          <Button size="sm" variant="danger" onClick={() => setConfirmOpen(true)} disabled={deleting}>
             <Trash2 className="h-3.5 w-3.5" />
             Delete
           </Button>
@@ -108,6 +110,16 @@ export function PrinterCard({ printer, electricityRate }: Props) {
           onSavingChange={setEditSaving}
         />
       </Dialog>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        title="Delete Printer"
+        description={`Are you sure you want to delete "${printer.name}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        onConfirm={handleDelete}
+        disabled={deleting}
+      />
     </>
   );
 }

@@ -5,6 +5,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import { deleteSupply } from "@/actions/supplies";
 import { Button } from "@/components/ui/Button";
 import { Dialog } from "@/components/ui/Dialog";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { SupplyForm, type SupplyFormHandle } from "./SupplyForm";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import type { SupplyData } from "@/lib/types";
@@ -18,12 +19,13 @@ export function SupplyCard({ supply }: Props) {
   const [editSaving, setEditSaving] = useState(false);
   const editFormRef = useRef<SupplyFormHandle>(null);
   const [deleting, setDeleting] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const { fmt } = useCurrency();
 
   const inventoryValue = supply.unitCost * supply.currentStock;
 
   async function handleDelete() {
-    if (!confirm(`Delete "${supply.name}"?`)) return;
+    setConfirmOpen(false);
     setDeleting(true);
     await deleteSupply(supply.id);
   }
@@ -52,7 +54,7 @@ export function SupplyCard({ supply }: Props) {
             <Pencil className="h-3.5 w-3.5" />
             Edit
           </Button>
-          <Button size="sm" variant="danger" onClick={handleDelete} disabled={deleting}>
+          <Button size="sm" variant="danger" onClick={() => setConfirmOpen(true)} disabled={deleting}>
             <Trash2 className="h-3.5 w-3.5" />
             Delete
           </Button>
@@ -79,6 +81,16 @@ export function SupplyCard({ supply }: Props) {
           onSavingChange={setEditSaving}
         />
       </Dialog>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        title="Delete Supply"
+        description={`Are you sure you want to delete "${supply.name}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        onConfirm={handleDelete}
+        disabled={deleting}
+      />
     </>
   );
 }

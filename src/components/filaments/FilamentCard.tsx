@@ -5,6 +5,7 @@ import { Pencil, Trash2, Plus } from "lucide-react";
 import { deleteFilament, addFilamentStock } from "@/actions/filaments";
 import { Button } from "@/components/ui/Button";
 import { Dialog } from "@/components/ui/Dialog";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Badge } from "@/components/ui/Badge";
 import { Input } from "@/components/ui/Input";
 import { FilamentForm, type FilamentFormHandle } from "./FilamentForm";
@@ -23,6 +24,7 @@ export function FilamentCard({ filament }: Props) {
   const [stockGrams, setStockGrams] = useState("");
   const [deleting, setDeleting] = useState(false);
   const [addingStock, setAddingStock] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const costPerGram = filament.costPerSpool / filament.spoolSizeG;
   const inventoryValue = costPerGram * filament.currentStockG;
@@ -40,7 +42,7 @@ export function FilamentCard({ filament }: Props) {
   }
 
   async function handleDelete() {
-    if (!confirm(`Delete "${filament.brand} ${filament.colorName}"?`)) return;
+    setConfirmOpen(false);
     setDeleting(true);
     await deleteFilament(filament.id);
   }
@@ -101,7 +103,7 @@ export function FilamentCard({ filament }: Props) {
             <Pencil className="h-3.5 w-3.5" />
             Edit
           </Button>
-          <Button size="sm" variant="danger" onClick={handleDelete} disabled={deleting}>
+          <Button size="sm" variant="danger" onClick={() => setConfirmOpen(true)} disabled={deleting}>
             <Trash2 className="h-3.5 w-3.5" />
             Delete
           </Button>
@@ -153,6 +155,16 @@ export function FilamentCard({ filament }: Props) {
           </div>
         </div>
       </Dialog>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        title="Delete Filament"
+        description={`Are you sure you want to delete "${filament.brand} ${filament.colorName}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        onConfirm={handleDelete}
+        disabled={deleting}
+      />
     </>
   );
 }

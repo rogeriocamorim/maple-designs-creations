@@ -11,6 +11,7 @@ import {
 } from "@/actions/marketplaces";
 import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/Checkbox";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import type { MarketplaceData } from "@/lib/types";
@@ -62,6 +63,7 @@ export function MarketplaceForm({ ref, marketplace, onClose, onSavingChange }: P
 
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [adSpendDeleteId, setAdSpendDeleteId] = useState<string | null>(null);
 
   useImperativeHandle(ref, () => ({ submit: handleSubmit }));
   const { symbol, fmt } = useCurrency();
@@ -144,7 +146,7 @@ export function MarketplaceForm({ ref, marketplace, onClose, onSavingChange }: P
   }
 
   async function handleDeleteAdSpend(id: string) {
-    if (!confirm("Remove this ad spend entry?")) return;
+    setAdSpendDeleteId(null);
     await deleteAdSpendEntry(id);
   }
 
@@ -355,7 +357,7 @@ export function MarketplaceForm({ ref, marketplace, onClose, onSavingChange }: P
                       </div>
                     </div>
                     <button
-                      onClick={() => handleDeleteAdSpend(entry.id)}
+                      onClick={() => setAdSpendDeleteId(entry.id)}
                       className="p-1 text-[#6b7280] hover:text-red-600"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
@@ -368,6 +370,14 @@ export function MarketplaceForm({ ref, marketplace, onClose, onSavingChange }: P
         </>
       )}
 
+      <ConfirmDialog
+        open={adSpendDeleteId !== null}
+        onOpenChange={(open) => { if (!open) setAdSpendDeleteId(null); }}
+        title="Remove Ad Spend Entry"
+        description="Are you sure you want to remove this ad spend entry? This action cannot be undone."
+        confirmLabel="Remove"
+        onConfirm={() => { if (adSpendDeleteId) handleDeleteAdSpend(adSpendDeleteId); }}
+      />
     </div>
   );
 }
