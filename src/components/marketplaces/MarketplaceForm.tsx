@@ -92,6 +92,11 @@ export function MarketplaceForm({ ref, marketplace, onClose, onSavingChange }: P
       setTransactionFeePct("13.25");
       setPaymentProcessingPct("2.95");
       setPaymentProcessingFixed("0.30");
+    } else if (newType === "direct_sale") {
+      setHasListingFee(false);
+      setHasTransactionFee(false);
+      setHasPaymentProcessing(false);
+      setHasReferralFee(false);
     }
     // "generic" — keep current toggles, user picks manually
   }
@@ -152,6 +157,7 @@ export function MarketplaceForm({ ref, marketplace, onClose, onSavingChange }: P
   }
 
   const typeOptions = [
+    { value: "direct_sale", label: "Direct Sale (no fees)" },
     { value: "etsy", label: "Etsy" },
     { value: "amazon", label: "Amazon" },
     { value: "ebay", label: "eBay" },

@@ -16,6 +16,7 @@ interface Props {
 }
 
 const TYPE_LABELS: Record<string, string> = {
+  direct_sale: "Direct Sale",
   etsy: "Etsy",
   amazon: "Amazon",
   ebay: "eBay",
@@ -37,10 +38,25 @@ export function MarketplaceCard({ marketplace }: Props) {
   }
 
   function feesSummary() {
-    if (marketplace.type === "etsy") {
-      return `${marketplace.transactionFeePct}% txn + ${marketplace.paymentProcessingPct}% proc + ${symbol}${marketplace.paymentProcessingFixed} + ${symbol}${marketplace.listingFee} listing`;
+    const parts: string[] = [];
+
+    if (marketplace.transactionFeePct != null) {
+      parts.push(`${marketplace.transactionFeePct}% txn`);
     }
-    return `${marketplace.referralFeePct}% referral`;
+    if (marketplace.paymentProcessingPct != null) {
+      parts.push(`${marketplace.paymentProcessingPct}% proc`);
+    }
+    if (marketplace.paymentProcessingFixed != null) {
+      parts.push(`${symbol}${marketplace.paymentProcessingFixed} proc fixed`);
+    }
+    if (marketplace.listingFee != null) {
+      parts.push(`${symbol}${marketplace.listingFee} listing`);
+    }
+    if (marketplace.referralFeePct != null) {
+      parts.push(`${marketplace.referralFeePct}% referral`);
+    }
+
+    return parts.length > 0 ? parts.join(" + ") : "No platform fees";
   }
 
   return (
